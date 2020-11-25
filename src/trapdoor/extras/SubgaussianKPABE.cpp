@@ -8,7 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include "abe/kp_abe.h"
-#include "subgaussian.h"
+#include "subgaussian/subgaussian.h"
 
 #include "utils/debug.h"
 

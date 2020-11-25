@@ -43,7 +43,7 @@
 #include "math/backend.h"
 #include "math/distrgen.h"
 #include "palisade.h"
-#include "subgaussian.h"
+#include "subgaussian/subgaussian.h"
 
 #include "utils/inttypes.h"
 /**

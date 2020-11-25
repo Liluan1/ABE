@@ -7,8 +7,8 @@
 
 #include <fstream>
 #include <iostream>
-#include "gsw.h"
-#include "subgaussian.h"
+#include "subgaussian/gsw.h"
+#include "subgaussian/subgaussian.h"
 
 #include "utils/debug.h"
 

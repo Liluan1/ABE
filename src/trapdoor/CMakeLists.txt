@@ -14,7 +14,6 @@ message(DEBUG "PALISADE_LIB: " ${PALISADE_INCLUDE})
 
 include_directories( ${PALISADE_INCLUDE}/core)
 include_directories( ${PALISADE_INCLUDE}/pke)
-include_directories( ${PALISADE_INCLUDE}/subgaussian)
 include_directories( include )
 include_directories( lib )
 
@@ -46,16 +45,15 @@ endif()
 install(DIRECTORY include/
 	DESTINATION include/palisade/trapdoor)
 
-set (TRAPDOORLIBS PUBLIC PALISADEtrapdoor PUBLIC PALISADEsubgaussian PUBLIC PALISADEpke PUBLIC PALISADEcore ${THIRDPARTYLIBS} ${OpenMP_CXX_FLAGS})
+set (TRAPDOORLIBS PUBLIC PALISADEtrapdoor PUBLIC PALISADEpke PUBLIC PALISADEcore ${THIRDPARTYLIBS} ${OpenMP_CXX_FLAGS})
 
-target_link_libraries (PALISADEtrapdoor PUBLIC PALISADEsubgaussian PUBLIC PALISADEpke PUBLIC PALISADEcore ${THIRDPARTYLIBS} ${OpenMP_CXX_FLAGS})
+target_link_libraries (PALISADEtrapdoor PUBLIC PALISADEpke PUBLIC PALISADEcore ${THIRDPARTYLIBS} ${OpenMP_CXX_FLAGS})
 if( ${BUILD_STATIC} )
-	target_link_libraries (PALISADEtrapdoor_static PUBLIC PALISADEsubgaussian_static PUBLIC PALISADEpke_static PUBLIC PALISADEcore_static ${THIRDPARTYSTATICLIBS} ${OpenMP_CXX_FLAGS})
+	target_link_libraries (PALISADEtrapdoor_static PUBLIC PALISADEpke_static PUBLIC PALISADEcore_static ${THIRDPARTYSTATICLIBS} ${OpenMP_CXX_FLAGS})
 endif()
 
 message(DEBUG "TRAPDOORLIBS: " ${TRAPDOORLIBS})
 message(DEBUG "PALISADEcore: " ${PALISADEcore})
-message(DEBUG "PALISADEsubgaussian: " ${PALISADEsubgaussian})
 
 add_custom_target( alltrapdoor )
 add_dependencies( alltrapdoor PALISADEtrapdoor )

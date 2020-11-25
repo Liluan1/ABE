@@ -16,7 +16,7 @@
 #include "utils/debug.h"
 
 #include "abe/kp_abe.h"
-#include "subgaussian.h"
+#include "subgaussian/subgaussian.h"
 
 using namespace std;
 using namespace lbcrypto;
