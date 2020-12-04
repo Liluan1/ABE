@@ -1,38 +1,32 @@
-PALISADE Lattice Cryptography Library
+PALISADE Lattice Cryptography Library Experimental Repository 
 =====================================
 
-PALISADE is a general lattice cryptography library that currently includes efficient implementations of the following lattice cryptography capabilities:
-* Fully Homomorphic Encryption (FHE)
-   * Brakerski/Fan-Vercauteren (BFV) scheme for integer arithmetic
-   * Brakerski-Gentry-Vaikuntanathan (BGV) scheme for integer arithmetic
-   * Cheon-Kim-Kim-Song (CKKS) scheme for real-number arithmetic
-   * Ducas-Micciancio (FHEW) and Chillotti-Gama-Georgieva-Izabachene (TFHE) schemes for Boolean circuit evaluation
-   * Stehle-Steinfeld scheme for limited integer arithmetic
-* Multi-Party Extensions of FHE (to support multi-key FHE)
-   * Threshold FHE for BGV, BFV, and CKKS schemes
-   * Proxy Re-Encryption for BGV, BFV, and CKKS schemes
-* Digital Signature
-* Identity-Based Encryption
-* Ciphertext-Policy Attribute-Based Encryption
+PALISADE is a general lattice cryptography library that currently
+includes efficient implementations of the following lattice
+cryptography capabilities:
+	
+	* Fully Homomorphic Encryption (FHE)
+	* Brakerski/Fan-Vercauteren (BFV) scheme for integer arithmetic
+	* Brakerski-Gentry-Vaikuntanathan (BGV) scheme for integer arithmetic
+	* Cheon-Kim-Kim-Song (CKKS) scheme for real-number arithmetic
+	* Ducas-Micciancio (FHEW) and Chillotti-Gama-Georgieva-Izabachene (TFHE) schemes for Boolean circuit evaluation
+	* Stehle-Steinfeld scheme for limited integer arithmetic
+	* Multi-Party Extensions of FHE (to support multi-key FHE)
+	* Threshold FHE for BGV, BFV, and CKKS schemes
+	* Proxy Re-Encryption for BGV, BFV, and CKKS schemes
+   
+This experimental repository holds implementations that as of version 1.11 will no longer be included in the main PALISADE release.
+
+	* Digital Signature
+	* Identity-Based Encryption
+	* Ciphertext-Policy Attribute-Based Encryption
+	
+Users should build and install PALISADE on their system. The include and library files are not included in this repostiory.
 
 PALISADE is a cross-platform C++11 library supporting Linux, Windows, and macOS. The supported compilers are g++ v6.1 or later and clang++ v6.0 or later.
 
-The library also includes unit tests and sample application demos.
-
 PALISADE is available under the BSD 2-clause license.
 
-The library is based on modular architecture with the following layers:
-
-* Math operations layer supporting low-level modular arithmetic, number theoretic transforms, and integer sampling.  This layer is implemented to be portable to multiple hardware computation substrates.
-* Lattice operations layer supporting lattice operations, ring algebra, and lattice trapdoor sampling.
-* Crypto layer containing efficient implementations of lattice cryptography schemes.
-* Encoding layer supporting multiple plaintext encodings for cryptographic schemes.
-
-A major focus is on the usability of the schemes. For instance, all HE schemes with packing use the same common API, and are implemented using runtime polymorphism.
-
-PALISADE implements efficient Residue Number System (RNS) algorithms to achieve high performance, e.g., PALISADE was used as the library for a winning genome-wide association studies solution at iDASH’18.
-
-By default, the library is built without external dependencies. But the user is also provided options to add GMP/NTL and/or tcmalloc third-party libraries if desired.
 
 Further information about PALISADE:
 
@@ -49,6 +43,8 @@ Further information about PALISADE:
 
 Build Instructions
 =====================================
+
+TBD -- the following are PALISADE build instructions
 
 We use CMake to build PALISADE. The high-level (platform-independent) procedure for building PALISADE is as follows (for OS-specific instructions, see the section "Detailed information about building PALISADE" at the bottom of this page):
 
