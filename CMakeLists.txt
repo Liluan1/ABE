@@ -27,9 +27,10 @@ endif()
 project (PALISADE C CXX)
 
 #note we should really get the versions from the installed Palisade
+#this is the required minimum version
 set(PALISADE_VERSION_MAJOR 1)
 set(PALISADE_VERSION_MINOR 10)
-set(PALISADE_VERSION_PATCH 5)
+set(PALISADE_VERSION_PATCH 6)
 set(PALISADE_VERSION ${PALISADE_VERSION_MAJOR}.${PALISADE_VERSION_MINOR}.${PALISADE_VERSION_PATCH})
 
 set(CMAKE_CXX_STANDARD 11)
@@ -80,6 +81,10 @@ if( NOT NATIVE_SIZE )
    # set( NATIVE_SIZE 128 )
 endif()
 
+if( NOT CKKS_M_FACTOR )
+   set( CKKS_M_FACTOR 1 )
+endif()
+
 ### Print options
 message( STATUS "BUILD_UNITTESTS:  ${BUILD_UNITTESTS}")
 message( STATUS "BUILD_EXAMPLES:   ${BUILD_EXAMPLES}")
@@ -92,6 +97,7 @@ message( STATUS "WITH_NTL:         ${WITH_NTL}")
 message( STATUS "WITH_TCM:         ${WITH_TCM}")
 message( STATUS "USE_OpenMP:       ${USE_OpenMP}")
 message( STATUS "NATIVE_SIZE:      ${NATIVE_SIZE}")
+message( STATUS "CKKS_M_FACTOR:    ${CKKS_M_FACTOR}")
 message( STATUS "WITH_NATIVEOPT:   ${WITH_NATIVEOPT}")
 message( STATUS "WITH_COVTEST:    ${WITH_COVTEST}")
 

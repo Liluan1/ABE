@@ -37,16 +37,8 @@
 
 #include "palisade.h"
 
-// #include "encoding/stringencoding.h"
-// #include "lattice/elemparams.h"
-// #include "lattice/ildcrtparams.h"
-// #include "lattice/ilelement.h"
-// #include "lattice/ilparams.h"
-// #include "math/backend.h"
-// #include "math/distrgen.h"
  #include "signaturecore.h"
-// #include "utils/hashutil.h"
-// #include "utils/inttypes.h"
+
 
 namespace lbcrypto {
 
