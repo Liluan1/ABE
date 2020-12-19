@@ -27,6 +27,7 @@
 #include <iostream>
 
 #include "include/gtest/gtest.h"
+
 #include "src/gtest-all.cc"
 
 #include "lattice/backend.h"
@@ -75,8 +76,9 @@ class MinimalistPrinter : public EmptyTestEventListener {
     for (int i = 0; i < tr->total_part_count(); i++) {
       auto pr = tr->GetTestPartResult(i);
       if (pr.passed()) continue;
-
-      internal::ColoredPrintf(internal::COLOR_GREEN, "[ RUN      ] ");
+	  //for some reason this no longer works for user projects? 
+      //internal::ColoredPrintf(internal::COLOR_GREEN, "[ RUN      ] ");
+	  printf( "[ RUN      ] ");
       printf("%s.%s\n", test_info.test_case_name(), test_info.name());
       fflush(stdout);
 
@@ -85,7 +87,8 @@ class MinimalistPrinter : public EmptyTestEventListener {
 
       cout << pr.summary() << endl;
 
-      internal::ColoredPrintf(internal::COLOR_RED, "[  FAILED  ] ");
+      //internal::ColoredPrintf(internal::COLOR_RED, "[  FAILED  ] ");
+      printf( "[  FAILED  ] ");
       printf("%s.%s\n", test_info.test_case_name(), test_info.name());
       fflush(stdout);
       internal::PrintFullTestCommentIfPresent(test_info);
@@ -117,7 +120,8 @@ class MinimalistPrinter : public EmptyTestEventListener {
         if (!test_info.should_run() || test_info.result()->Passed()) {
           continue;
         }
-        internal::ColoredPrintf(internal::COLOR_RED, "[  FAILED  ] ");
+        //internal::ColoredPrintf(internal::COLOR_RED, "[  FAILED  ] ");
+		printf( "[  FAILED  ] ");
         printf("%s.%s", test_case.name(), test_info.name());
         internal::PrintFullTestCommentIfPresent(test_info);
         printf("\n");
