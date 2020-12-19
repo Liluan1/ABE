@@ -40,11 +40,12 @@ message(STATUS "PALISADE_LIBRARIES found: ${PALISADE_LIBRARIES}")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-### ADD our executable
-add_subDirectory(src/abe)
 
 option( BUILD_UNITTESTS "Set to ON to build unit tests for the library" ON)
 option( BUILD_EXAMPLES "Set to ON to build examples for the library" ON)
 
 message( STATUS "BUILD_UNITTESTS:  ${BUILD_UNITTESTS}")
 message( STATUS "BUILD_EXAMPLES:   ${BUILD_EXAMPLES}")
+
+### ADD our executable
+add_subDirectory(src/abe)
