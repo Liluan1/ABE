@@ -10,7 +10,6 @@ cryptography capabilities:
 	* Brakerski-Gentry-Vaikuntanathan (BGV) scheme for integer arithmetic
 	* Cheon-Kim-Kim-Song (CKKS) scheme for real-number arithmetic
 	* Ducas-Micciancio (FHEW) and Chillotti-Gama-Georgieva-Izabachene (TFHE) schemes for Boolean circuit evaluation
-	* Stehle-Steinfeld scheme for limited integer arithmetic
 	* Multi-Party Extensions of FHE (to support multi-key FHE)
 	* Threshold FHE for BGV, BFV, and CKKS schemes
 	* Proxy Re-Encryption for BGV, BFV, and CKKS schemes
@@ -41,25 +40,39 @@ Further information about PALISADE:
 
 Build Instructions
 =====================================
-This reopsitory has been tested to run with PALISADE development release 1.10.6
+This reopsitory has been tested to run with PALISADE development release 1.11.
 
-* Install that release on your system following instructions to be found in that repo
+* Install PALISADE from that release on your system. Full instructions
+  for this are to be found in the `README.md` file in the PALISADE
+  repo.
+
+Run `make install` at the end to install the system to the default
+location (you can change this location, but then you will have to
+change the Makefile in this repo to reflect the new location).
+
+Note you may have to execute the following on your system to
+automatically find the installed libraries and include files:
+
+> `sudo ldconfig`
+
+  found in that repo. 
 
 * Clone this repo on your system 
 
-We use CMake to build abe. The high-level
-(platform-independent) procedure for building PALISADE is as follows
-(for OS-specific instructions, see the section "Detailed information
-about building PALISADE" at the bottom of this page). Note PALISADE has similar requirements, so if that builds on your system you are all set :
+We use CMake to build abe. The high-level (platform-independent)
+procedure for building PALISADE is as follows (for OS-specific
+instructions, see the section "Detailed information about building
+PALISADE" at the bottom of this page). Note PALISADE has similar
+requirements, so if that builds on your system you are all set :
 
-* Install system prerequisites (if not already installed), including a C++ compiler with OMP support, cmake, make, and autoconf.
+* Install system prerequisites (if not already installed), including a
+  C++ compiler with OMP support, cmake, make, and autoconf.
 
  Download git submodules by running the following commands (PALISADE downloads submodules for google-test open-source library):
 ```
 git submodule update --init  --recursive --remote
 ```
-
-4. Create a directory where the binaries will be built. The typical choice is a subfolder "build". In this case, the commands are:
+* Create a directory where the binaries will be built. The typical choice is a subfolder "build". In this case, the commands are:
 ```
 mkdir build
 cd build
@@ -72,7 +85,7 @@ successfully, please review the error CMake shows at the end. If the
 error does not go away (even though you installed the dependency), try
 running "make clean" to clear the CMake cache.
 
-6. Build PALISADE by running the following command (this will take few minutes; using the -j make command-line flag is suggested to speed up the build)
+* Build the executables by running the following command (this will take few minutes; using the -j make command-line flag is suggested to speed up the build)
 ```
 make
 ```
@@ -114,20 +127,3 @@ PALISADE users have reported successful operation on the following systems:
 * Ubuntu [16.04]
 
 Please let us know the results if you have run PALISADE any additional systems not listed above.
-
-Detailed information about building PALISADE
-------------------------------
-
-More detailed steps for some common platforms are provided in the following Wiki articles:
-
-[Instructions for building PALISADE in Linux](https://gitlab.com/palisade/palisade-development/wikis/Instructions-for-building-PALISADE-in-Linux)
-
-[Instructions for building PALISADE in Windows](https://gitlab.com/palisade/palisade-development/wikis/Instructions-for-building-PALISADE-in-Windows)
-
-[Instructions for building PALISADE in macOS](https://gitlab.com/palisade/palisade-development/wikis/Instructions-for-building-PALISADE-in-macOS)
-
-PALISADE provides many CMake/make configuration options, such as installing specific modules of the library, compiling only libraries w/o any unit tests and demos, choosing the Debug mode for compilation, turning on/off NTL/GMP. These options are described in detail in the following Wiki article:
-
-[Use of CMake in PALISADE](https://gitlab.com/palisade/palisade-development/-/wikis/Use-of-CMake-in-PALISADE)
-
-[Instructions for building user projects that use PALISADE](https://gitlab.com/palisade/palisade-development/wikis/Instructions-for-building-user-projects-that-use-PALISADE)
