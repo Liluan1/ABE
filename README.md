@@ -41,7 +41,7 @@ Further information about PALISADE:
 
 Build Instructions
 =====================================
-This reopsitory has been tested to run with PALISADE development release 1.11.
+This repository has been tested to run with PALISADE development release 1.11.
 
 * Install PALISADE from that release on your system. Full instructions
   for this are to be found in the `README.md` file in the PALISADE
