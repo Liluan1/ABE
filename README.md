@@ -5,18 +5,19 @@ PALISADE is a general lattice cryptography library that currently
 includes efficient implementations of the following lattice
 cryptography capabilities:
 	
-	* Fully Homomorphic Encryption (FHE)
-	* Brakerski/Fan-Vercauteren (BFV) scheme for integer arithmetic
-	* Brakerski-Gentry-Vaikuntanathan (BGV) scheme for integer arithmetic
-	* Cheon-Kim-Kim-Song (CKKS) scheme for real-number arithmetic
-	* Ducas-Micciancio (FHEW) and Chillotti-Gama-Georgieva-Izabachene (TFHE) schemes for Boolean circuit evaluation
-	* Multi-Party Extensions of FHE (to support multi-key FHE)
-	* Threshold FHE for BGV, BFV, and CKKS schemes
-	* Proxy Re-Encryption for BGV, BFV, and CKKS schemes
+* Fully Homomorphic Encryption (FHE)
+   * Brakerski/Fan-Vercauteren (BFV) scheme for integer arithmetic
+   * Brakerski-Gentry-Vaikuntanathan (BGV) scheme for integer arithmetic
+   * Cheon-Kim-Kim-Song (CKKS) scheme for real-number arithmetic
+   * Ducas-Micciancio (FHEW) and Chillotti-Gama-Georgieva-Izabachene (TFHE) schemes for Boolean circuit evaluation
+* Multi-Party Extensions of FHE (to support multi-key FHE)
+   * Threshold FHE for BGV, BFV, and CKKS schemes
+   * Proxy Re-Encryption for BGV, BFV, and CKKS schemes
    
-This experimental repository holds implementations that as of version 1.11 will no longer be included in the main PALISADE release.
+This experimental repository holds the implementation of the following lattice-based cryptography capabilities (as of version 1.11, this implementations will no longer be included in the main PALISADE release).
 
-	* Atribute Based Encryption (abe)
+* Identity-Based Encryption
+* Ciphertext-Policy Attributed-Based Encryption
 	
 Users should build and install PALISADE on their system. The include and library files are not included in this repostiory.
 
@@ -70,7 +71,8 @@ requirements, so if that builds on your system you are all set :
 
  Download git submodules by running the following commands (PALISADE downloads submodules for google-test open-source library):
 ```
-git submodule update --init  --recursive --remote
+git submodule sync --recursive
+git submodule update --init  --recursive
 ```
 * Create a directory where the binaries will be built. The typical choice is a subfolder "build". In this case, the commands are:
 ```
