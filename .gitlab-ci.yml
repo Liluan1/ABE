@@ -1,0 +1,90 @@
+# Global Definitions
+
+stages:
+  - build
+  - test
+
+variables:
+  INSTALL_DIR: PALISADE_local_install
+
+# Build jobs
+
+build_abe:
+  except:
+    variables:
+      - $UPSTREAM_BRANCH_REF
+  stage: build
+  before_script:
+    - if [[ ${COMPILER^^} == "CLANG" ]]; then TARG_CC=/usr/bin/clang-9; TARG_CXX=/usr/bin/clang++-9;else export TARG_CC=gcc; export TARG_CXX=g++; fi
+    - git clone https://gitlab.com/palisade/palisade-development.git PALISADE
+    - cd PALISADE
+    - mkdir -p build
+    - cd build
+    - mkdir -p ../../$INSTALL_DIR
+    - cmake -DCMAKE_INSTALL_PREFIX=../../$INSTALL_DIR -DBUILD_UNITTESTS=OFF -DBUILD_BENCHMARKS=OFF -DBUILD_EXTRAS=OFF -DBUILD_EXAMPLES=OFF ..
+    - make install -j10
+    - cat ../../$INSTALL_DIR/lib/Palisade/PalisadeConfig.cmake
+    - ls ../../$INSTALL_DIR/lib
+    - ls ../../$INSTALL_DIR/lib/Palisade
+    - cd ../..
+    - rm -rf PALISADE
+  script:
+    - pwd
+    - echo $LD_LIBRARY_PATH
+    - mkdir -p build
+    - cd build
+    - CC=${TARG_CC} CXX=${TARG_CXX} cmake -DCMAKE_PREFIX_PATH=$(realpath ../${INSTALL_DIR}) ..
+    - make -j10
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - build
+      - $INSTALL_DIR
+
+build_abe_downstream:
+  only:
+    variables:
+      - $UPSTREAM_BRANCH_REF
+  stage: build
+  before_script:
+    - echo "DOWNSTREAM PULL"
+  script:
+    - pwd
+    - echo $LD_LIBRARY_PATH
+    - echo $TARG_CC
+    - echo $TARG_CXX
+    - echo $UPSTREAM_BRANCH_REF
+    - mkdir -p build
+    - cd build
+    - CC=${TARG_CC} CXX=${TARG_CXX} cmake -DCMAKE_PREFIX_PATH=$(realpath ../$INSTALL_DIR) ..
+    - make -j10
+  needs:
+    - project: palisade/palisade-development
+      job: default_build_install
+      ref: $UPSTREAM_BRANCH_REF
+      artifacts: true
+    - project: palisade/palisade-development
+      job: define_vars
+      ref: $UPSTREAM_BRANCH_REF
+      artifacts: true
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - build
+      - $INSTALL_DIR
+
+# Test jobs
+
+test_abe:
+  stage: test
+  before_script:
+    - export LD_LIBRARY_PATH=$(pwd)/build/lib:$(pwd)/${INSTALL_DIR}/lib
+  script:
+    - ./build/unittest/abe_tests --gtest_output=xml
+  artifacts:
+    paths:
+      - test_detail.xml
+    expire_in: 1 hours
+  dependencies:
+    - build_abe
+    - build_abe_downstream
