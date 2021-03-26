@@ -10,8 +10,7 @@ project(EXAMPLES CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-#change to 1.11 once v1.11 is released
-find_package(Palisade 1.10.6)
+find_package(Palisade 1.11.0)
 
 set( CMAKE_CXX_FLAGS ${PALISADE_CXX_FLAGS} )
 set( CMAKE_EXE_LINKER_FLAGS ${PALISADE_EXE_LINKER_FLAGS} )
