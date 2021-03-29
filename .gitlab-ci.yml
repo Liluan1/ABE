@@ -2,6 +2,7 @@
 
 stages:
   - build
+  - build_downstream
   - test
 
 variables:
@@ -45,7 +46,7 @@ build_abe_downstream:
   only:
     variables:
       - $UPSTREAM_BRANCH_REF =~ /master/
-  stage: build
+  stage: build_downstream
   before_script:
     - echo "DOWNSTREAM PULL"
   script:
@@ -79,7 +80,7 @@ build_abe_downstream_manual:
       - master
     variables:
       - $UPSTREAM_BRANCH_REF =~ /master/
-  stage: build
+  stage: build_downstream
   before_script:
     - echo "DOWNSTREAM PULL"
   script:
