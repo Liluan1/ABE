@@ -92,7 +92,7 @@ build_abe_downstream_manual:
     - make -j10
   needs:
     - project: palisade/palisade-development
-      job: default_build_install
+      job: default_build_install_manual
       ref: $UPSTREAM_BRANCH_REF
       artifacts: true
     - project: palisade/palisade-development
