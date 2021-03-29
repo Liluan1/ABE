@@ -74,9 +74,11 @@ build_abe_downstream:
       - $INSTALL_DIR
 
 build_abe_downstream_manual:
-  only:
+  except:
+    refs:
+      - master
     variables:
-      - $UPSTREAM_BRANCH_REF
+      - $UPSTREAM_BRANCH_REF =~ /master/
   stage: build
   before_script:
     - echo "DOWNSTREAM PULL"
