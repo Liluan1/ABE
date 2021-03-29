@@ -94,4 +94,3 @@ test_abe:
   dependencies:
     - build_abe
     - build_abe_downstream
-    - build_abe_downstream_manual
