@@ -49,7 +49,7 @@ build_abe_downstream:
   stage: build_downstream
   before_script:
     - if [[ ${COMPILER^^} == "CLANG" ]]; then TARG_CC=/usr/bin/clang-9; TARG_CXX=/usr/bin/clang++-9;else export TARG_CC=gcc-7; export TARG_CXX=g++-7; fi
-    - git clone https://gitlab.com/palisade/palisade-development.git PALISADE
+    - git clone --single-branch --branch $UPSTREAM_BRANCH_REF https://gitlab.com/palisade/palisade-development.git PALISADE
     - cd PALISADE
     - mkdir -p build
     - cd build
@@ -68,6 +68,11 @@ build_abe_downstream:
     - cd build
     - CC=${TARG_CC} CXX=${TARG_CXX} cmake -DCMAKE_PREFIX_PATH=$(realpath ../${INSTALL_DIR}) ..
     - make -j10
+  needs:
+    - project: palisade/palisade-development
+      job: define_vars_manual
+      ref: $UPSTREAM_BRANCH_REF
+      artifacts: true
   artifacts:
     expire_in: 1 hour
     paths:
@@ -83,7 +88,7 @@ build_abe_downstream_manual:
   stage: build_downstream
   before_script:
     - if [[ ${COMPILER^^} == "CLANG" ]]; then TARG_CC=/usr/bin/clang-9; TARG_CXX=/usr/bin/clang++-9;else export TARG_CC=gcc-7; export TARG_CXX=g++-7; fi
-    - git clone https://gitlab.com/palisade/palisade-development.git PALISADE
+    - git clone --single-branch --branch $UPSTREAM_BRANCH_REF https://gitlab.com/palisade/palisade-development.git PALISADE
     - cd PALISADE
     - mkdir -p build
     - cd build
@@ -102,6 +107,11 @@ build_abe_downstream_manual:
     - cd build
     - CC=${TARG_CC} CXX=${TARG_CXX} cmake -DCMAKE_PREFIX_PATH=$(realpath ../${INSTALL_DIR}) ..
     - make -j10
+  needs:
+    - project: palisade/palisade-development
+      job: define_vars_manual
+      ref: $UPSTREAM_BRANCH_REF
+      artifacts: true
   artifacts:
     expire_in: 1 hour
     paths:
