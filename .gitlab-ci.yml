@@ -45,6 +45,7 @@ build_abe:
 build_abe_downstream:
   only:
     variables:
+      - $UPSTREAM_BRANCH_REF
       - $UPSTREAM_BRANCH_REF =~ /master/
   stage: build_downstream
   before_script:
@@ -83,6 +84,7 @@ build_abe_downstream_manual:
   except:
     variables:
       - $UPSTREAM_BRANCH_REF =~ /master/
+      - $CI_COMMIT_REF_NAME =~ /master/
   stage: build_downstream
   before_script:
     - if [[ ${COMPILER^^} == "CLANG" ]]; then TARG_CC=/usr/bin/clang-9; TARG_CXX=/usr/bin/clang++-9;else export TARG_CC=gcc-7; export TARG_CXX=g++-7; fi
