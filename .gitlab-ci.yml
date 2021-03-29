@@ -81,6 +81,8 @@ build_abe_downstream:
 
 build_abe_downstream_manual:
   except:
+    refs:
+      - master
     variables:
       - $UPSTREAM_BRANCH_REF =~ /master/
   stage: build_downstream
