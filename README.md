@@ -69,11 +69,6 @@ requirements, so if that builds on your system you are all set :
 * Install system prerequisites (if not already installed), including a
   C++ compiler with OMP support, cmake, make, and autoconf.
 
- Download git submodules by running the following commands (PALISADE downloads submodules for google-test open-source library):
-```
-git submodule sync --recursive
-git submodule update --init  --recursive
-```
 * Create a directory where the binaries will be built. The typical choice is a subfolder "build". In this case, the commands are:
 ```
 mkdir build
