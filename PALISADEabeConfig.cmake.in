@@ -1,0 +1,26 @@
+# - Config file for the PALISADEabe package
+# It defines the following variables
+#  ABE_INCLUDE_DIRS - include directories for PALISADEabe
+#  ABE_LIBRARIES    - libraries to link against
+
+get_filename_component(ABE_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT ABE_BINARY_DIR)
+  include("${ABE_CMAKE_DIR}/PALISADEabeTargets.cmake")
+endif()
+
+# These are IMPORTED targets created by PALISADEabeTargets.cmake
+set(ABE_INCLUDE "@INSTALL_INCLUDE_DIR@")
+set(ABE_LIBDIR "@INSTALL_LIB_DIR@")
+set(ABE_LIBRARIES @ABE_PACKAGE_LIBS@ @PALISADE_LIBRARIES@ @THIRDPARTYLIBS@ @OpenMP_CXX_FLAGS@)
+set(ABE_STATIC_LIBRARIES @ABE_STATIC_LIBS@ @PALISADE_STATIC_LIBRARIES@ @THIRDPARTYLIBS@ @OpenMP_CXX_FLAGS@)
+set(ABE_SHARED_LIBRARIES @ABE_SHARED_LIBS@ @PALISADE_SHARED_LIBRARIES@ @THIRDPARTYLIBS@ @OpenMP_CXX_FLAGS@)
+
+set(OPENMP_INCLUDES "@OPENMP_INCLUDES@" )
+set(OPENMP_LIBRARIES "@OPENMP_LIBRARIES@" )
+
+set(ABE_CXX_FLAGS "@CMAKE_CXX_FLAGS@ @OpenMP_CXX_FLAGS@")
+set(ABE_C_FLAGS "@CMAKE_C_FLAGS@ @OpenMP_C_FLAGS@")
+
+set (ABE_EXE_LINKER_FLAGS "@CMAKE_EXE_LINKER_FLAGS@ @OpenMP_EXE_LINKER_FLAGS@")
