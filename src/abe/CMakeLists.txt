@@ -1,21 +1,21 @@
 #list all sources in this directory for the library (found in the lib subdirectory)
 file(GLOB ABELIB_SOURCES "lib/*-impl.cpp")
 
-include_directories(include) #to find abe/include files
+include_directories(${CORE_INCLUDE_DIRS})
+include_directories(${PKE_INCLUDE_DIRS})
+list(APPEND ABE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+list(APPEND ABE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+include_directories(${ABE_INCLUDE_DIRS})
 
-set(ABE_VERSION_MAJOR ${PALISADE_VERSION_MAJOR})
-set(ABE_VERSION_MINOR ${PALISADE_VERSION_MINOR})
-set(ABE_VERSION_PATCH ${PALISADE_VERSION_PATCH})
-set(ABE_VERSION ${ABE_VERSION_MAJOR}.${ABE_VERSION_MINOR}.${ABE_VERSION_PATCH})
+add_library (abeobj OBJECT ${ABELIB_SOURCES})
+add_dependencies(abeobj PALISADEcore)
+set_property(TARGET abeobj PROPERTY POSITION_INDEPENDENT_CODE 1)
 
-add_custom_target( allabe ) #special make target to make all abe files
-add_dependencies( allabe PALISADEabe) #add library to make allabe target
-
-#generate the shared library from the sources in that direcory
-add_library(PALISADEabe SHARED ${ABELIB_SOURCES})
+add_library(PALISADEabe SHARED $<TARGET_OBJECTS:abeobj>)
 set_property(TARGET PALISADEabe PROPERTY VERSION ${ABE_VERSION})
 set_property(TARGET PALISADEabe PROPERTY SOVERSION ${ABE_VERSION_MAJOR})
 set_property(TARGET PALISADEabe PROPERTY POSITION_INDEPENDENT_CODE 1)
+
 #sets the local destination target for library output
 #this creates the lib directory in build and puts PALISADEabe there
 #note without this we would build to build/src/lib
@@ -25,13 +25,21 @@ set_property(TARGET PALISADEabe PROPERTY LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY
 set_property(TARGET PALISADEabe PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 #these lines are needed for make install to work
-install(TARGETS PALISADEabe EXPORT PalisadeTargets DESTINATION lib)
-install(DIRECTORY include/
-	DESTINATION include/palisade/abe)
 
-#set the libraries needed for our examples
+install(
+	TARGETS PALISADEabe 
+	EXPORT PALISADEabeTargets 
+	DESTINATION lib)
+install(
+	DIRECTORY include/
+	DESTINATION include/palisade-abe)
+
 set (ABELIBS PUBLIC PALISADEabe ${PALISADE_LIBRARIES})
+
 target_link_libraries (PALISADEabe ${PALISADE_LIBRARIES})
+
+add_custom_target( allabe ) #special make target to make all abe files
+add_dependencies( allabe PALISADEabe) #add library to make allabe target
 
 ##########################################################
 ### now build all files in examples and put executables in bin/abe/examples
@@ -74,3 +82,6 @@ if( BUILD_UNITTESTS )
 	add_custom_command( OUTPUT runabetests WORKING_DIRECTORY ${CMAKE_BINARY_DIR} COMMAND ${CMAKE_BINARY_DIR}/unittest/abe_tests )
 	add_custom_target( testabe DEPENDS abe_tests runabetests )
 endif()
+
+add_custom_command( OUTPUT abeinfocmd COMMAND echo Builds PALISADEabe and these apps: ${PKEAPPS} )
+add_custom_target( abeinfo DEPENDS abeinfocmd )

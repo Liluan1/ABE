@@ -1,16 +1,22 @@
 cmake_minimum_required (VERSION 3.5.1)
 
-# this version will get incremented only if new changes are made in this repo
-set(PALISADE_VERSION_MAJOR 1)
-set(PALISADE_VERSION_MINOR 11)
-set(PALISADE_VERSION_PATCH 0)
-set(PALISADE_VERSION ${PALISADE_VERSION_MAJOR}.${PALISADE_VERSION_MINOR}.${PALISADE_VERSION_PATCH})
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
 
-project(EXAMPLES CXX)
+project(PALISADEabe CXX)
+
+# this version will get incremented only if new changes are made in this repo
+set(ABE_VERSION_MAJOR 1)
+set(ABE_VERSION_MINOR 11)
+set(ABE_VERSION_PATCH 0)
+set(ABE_VERSION ${ABE_VERSION_MAJOR}.${ABE_VERSION_MINOR}.${ABE_VERSION_PATCH})
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-find_package(Palisade 1.11.0)
+find_package(Palisade 1.11.0 REQUIRED)
 
 set( CMAKE_CXX_FLAGS ${PALISADE_CXX_FLAGS} )
 set( CMAKE_EXE_LINKER_FLAGS ${PALISADE_EXE_LINKER_FLAGS} )
@@ -20,6 +26,104 @@ include_directories( ${PALISADE_INCLUDE} )
 include_directories( ${PALISADE_INCLUDE}/third-party/include )
 include_directories( ${PALISADE_INCLUDE}/core )
 include_directories( ${PALISADE_INCLUDE}/pke )
+
+#--------------------------------------------------------------------
+# Compiler logic
+#--------------------------------------------------------------------
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    # require at least gcc 6.1
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.1)
+        message(WARNING "GCC version should be at least 6.1.")
+    endif()
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    # require at least clang 6
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6)
+        message(WARNING "Clang version should be at least 6.")
+    endif()
+else()
+	message(WARNING "You are using ${CMAKE_CXX_COMPILER_ID} version ${CMAKE_CXX_COMPILER_VERSION}, which is unsupported.")
+endif()
+
+# use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_SKIP_BUILD_RPATH  FALSE)
+
+# when building, don't use the install RPATH already
+# (but later on when installing)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+
+set(CMAKE_INSTALL_RPATH "${LIBINSTALL}")
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# the RPATH to be used when installing, but only if it's not a system directory
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${LIBINSTALL}" isSystemDir)
+if("${isSystemDir}" STREQUAL "-1")
+   set(CMAKE_INSTALL_RPATH "${LIBINSTALL}")
+endif("${isSystemDir}" STREQUAL "-1")
+
+# Compiler flags
+
+# Added -Wno-parentheses for compatibility with g++
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set (IGNORE_WARNINGS "-Wno-parentheses")
+    # we can use GNU built-in functions provided by GCC for debugging. ex: __builtin_LINE (), __builtin_FUNCTION (), __builtin_FILE ()
+    add_definitions(-DBUILTIN_INFO_AVAILABLE)
+    message (STATUS "BUILTIN_INFO_AVAILABLE is defined")
+endif()
+
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+	set(IGNORE_WARNINGS "${IGNORE_WARNINGS} -Wno-unused-private-field -Wno-shift-op-parentheses")
+endif()
+
+set(C_COMPILE_FLAGS "-Wall -Werror -O3 ")
+set(CXX_COMPILE_FLAGS "-Wall -Werror -O3 ${NATIVE_OPT} ${IGNORE_WARNINGS}")
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_COMPILE_FLAGS}")
+
+#--------------------------------------------------------------------
+# Installation logic
+#--------------------------------------------------------------------
+set(INSTALL_LIB_DIR lib CACHE PATH
+	"Installation directory for libraries")
+set(INSTALL_INCLUDE_DIR include/palisade-abe CACHE PATH
+	"Installation directory for headers")
+if(WIN32 AND NOT CYGWIN)
+  set(DEF_INSTALL_CMAKE_DIR CMake)
+else()
+  set(DEF_INSTALL_CMAKE_DIR lib/PALISADEabe)
+endif()
+set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH
+  "Installation directory for CMake files")
+
+foreach(p LIB INCLUDE CMAKE)
+  set(var INSTALL_${p}_DIR)
+  if(NOT IS_ABSOLUTE "${${var}}")
+    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
+  endif()
+endforeach()
+
+message("***** INSTALL IS AT ${CMAKE_INSTALL_PREFIX}; to change, run cmake with -DCMAKE_INSTALL_PREFIX=/your/path")
+set (CMAKE_INSTALL_MESSAGE LAZY)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+#--------------------------------------------------------------------
+# Machine-specific checks
+#--------------------------------------------------------------------
+# determine the architecture on a Linux/Unix/macOS/MinGW system
+if(CMAKE_HOST_UNIX OR MINGW)
+  EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
+else()
+  set(ARCHITECTURE "unknown")
+endif()
+
+if(ARCHITECTURE)
+  message(STATUS "Architecture is " ${ARCHITECTURE})
+endif()
 
 # third party directories
 
@@ -88,3 +192,41 @@ if(GIT_SUBMOD_AUTO AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
         set(GIT_SUBMODULE_SYNCED ON CACHE BOOL "" FORCE)
     endif()
 endif()
+
+#--------------------------------------------------------------------
+# Create PALISADEabe package
+#--------------------------------------------------------------------
+set(ABE_SHARED_LIBS "PALISADEabe")
+set(ABE_PACKAGE_LIBS ${ABE_SHARED_LIBS})
+
+export(EXPORT PALISADEabeTargets FILE "${PROJECT_BINARY_DIR}/PALISADEabeTargets.cmake")
+
+export(PACKAGE PALISADEabe)
+
+# Create the PALISADEabeConfig.cmake and PALISADEabeConfigVersion files
+file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
+   "${INSTALL_INCLUDE_DIR}")
+# ... for the build tree
+set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
+configure_file(PALISADEabeConfig.cmake.in
+  "${PROJECT_BINARY_DIR}/PALISADEabeConfig.cmake" @ONLY)
+# ... for the install tree
+set(CONF_INCLUDE_DIRS "\${PALISADE_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+configure_file(PALISADEabeConfig.cmake.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/PALISADEabeConfig.cmake" @ONLY)
+# ... for both
+configure_file(PALISADEabeConfigVersion.cmake.in
+  "${PROJECT_BINARY_DIR}/PALISADEabeConfigVersion.cmake" @ONLY)
+
+# Install the PALISADEabeConfig.cmake and PALISADEabeConfigVersion.cmake
+install(FILES
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/PALISADEabeConfig.cmake"
+  "${PROJECT_BINARY_DIR}/PALISADEabeConfigVersion.cmake"
+  DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+
+# Install the export set for use with the install-tree
+install(EXPORT PALISADEabeTargets DESTINATION
+  "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+
+
+add_custom_target( allmodules DEPENDS ${PALISADE_SHARED_LIBS} )
