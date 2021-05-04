@@ -90,6 +90,14 @@ If you want to build only library files or some other subset of abe, please revi
 
 After the "make" completes, you should see the abe library file in the lib folder, binaries of examples in bin/examples and binaries for unit tests in the bin/unittest folder.
 
+* Optionally, the library, `PALISADEabe`, can be installed.
+```bash
+make install
+```
+**Note** - The default installation path is `/usr/local/` and likely requires admin priviledges.
+
+If this library is installed it must be found uniquely but with Palisade as well. See [CMakeLists.Users.txt](CMakeLists.User.txt) for how to use this library.
+
 Testing and cleaning the build
 -------------------
 
@@ -124,3 +132,22 @@ PALISADE users have reported successful operation on the following systems:
 * Ubuntu [16.04]
 
 Please let us know the results if you have run PALISADE any additional systems not listed above.
+
+### Windows
+
+PALISADE extensions are encapsulated in independent repositories and are therefore installed in unique paths. The following snippet gives an example of how to include the extensions when using MinGW:
+
+```bash
+palisadeLibs=(
+    '/c/Program Files (x86)/PALISADE/lib' 
+    '/c/Program Files (x86)/PALISADEabe/lib' 
+    '/c/Program Files (x86)/PALISADEsignature/lib' 
+    '/c/Program Files (x86)/PALISADEtrapdoor/lib')
+
+for ((i=0; i < ${#palisadeLibs[*]}; i++))
+do
+    lib=${palisadeLibs[$i]}
+    PATH="${PATH}:${lib}"
+done
+```
+**Note** This can be pasted into `.bashrc`, `.profile`, etc. to make it perminent.
