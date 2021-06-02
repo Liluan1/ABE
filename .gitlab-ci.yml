@@ -37,7 +37,7 @@ build_abe:
     - CC=${TARG_CC} CXX=${TARG_CXX} cmake -DCMAKE_PREFIX_PATH=$(realpath ../${INSTALL_DIR}) ..
     - make -j10
   artifacts:
-    expire_in: 1 hour
+    expire_in: 1 day
     paths:
       - build
       - $INSTALL_DIR
@@ -74,7 +74,7 @@ build_abe_downstream:
       ref: $UPSTREAM_BRANCH_REF
       artifacts: true
   artifacts:
-    expire_in: 1 hour
+    expire_in: 1 day
     paths:
       - build
       - $INSTALL_DIR
