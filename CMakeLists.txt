@@ -159,7 +159,8 @@ LIST(REMOVE_ITEM       clean_files "")
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_CLEAN_FILES "${clean_files}")
 message(STATUS "clean files ${clean_files}")
 
-add_subdirectory(src/abe)
+# add_subdirectory(src/abe)
+add_subdirectory(src/TA15)
 
 # auto-update git submodules
 find_package (Git REQUIRED)
