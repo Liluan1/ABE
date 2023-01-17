@@ -17,15 +17,18 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(Palisade 1.11.0 REQUIRED)
+find_package(cereal 1.3.2 REQUIRED)
 
 set( CMAKE_CXX_FLAGS ${PALISADE_CXX_FLAGS} )
 set( CMAKE_EXE_LINKER_FLAGS ${PALISADE_EXE_LINKER_FLAGS} )
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 include_directories( ${OPENMP_INCLUDES} )
 include_directories( ${PALISADE_INCLUDE} )
 include_directories( ${PALISADE_INCLUDE}/third-party/include )
 include_directories( ${PALISADE_INCLUDE}/core )
 include_directories( ${PALISADE_INCLUDE}/pke )
+include_directories( ${cereal_INCLUDE_DIRS})
 
 #--------------------------------------------------------------------
 # Compiler logic
@@ -78,7 +81,7 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 endif()
 
 set(C_COMPILE_FLAGS "-Wall -Werror -O3 ")
-set(CXX_COMPILE_FLAGS "-Wall -Werror -O3 ${NATIVE_OPT} ${IGNORE_WARNINGS}")
+set(CXX_COMPILE_FLAGS "-Wall -Werror -Wno-reorder -O3 ${NATIVE_OPT} ${IGNORE_WARNINGS}")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_COMPILE_FLAGS}")

@@ -256,7 +256,8 @@ void CPABEScheme<Element>::Encrypt(shared_ptr<ABECoreParams<Element>> bm_params,
                                    const ABECoreMasterPublicKey<Element>& bmpk,
                                    const ABECoreAccessPolicy<Element>& bap,
                                    Element ptxt,
-                                   ABECoreCiphertext<Element>* bctext) {
+                                   ABECoreCiphertext<Element>* bctext,
+                                   Element* bs) {
   auto m_params = std::static_pointer_cast<CPABEParams<Element>>(bm_params);
   const auto& mpk = static_cast<const CPABEMasterPublicKey<Element>&>(bmpk);
   const auto& ap = static_cast<const CPABEAccessPolicy<Element>&>(bap);
@@ -287,6 +288,7 @@ void CPABEScheme<Element>::Encrypt(shared_ptr<ABECoreParams<Element>> bm_params,
 
   Element s(dug, m_params->GetTrapdoorParams()->GetElemParams(),
             Format::COEFFICIENT);
+  *bs = s;
   s.SwitchFormat();
 
   // A part
@@ -424,6 +426,87 @@ void CPABEScheme<Element>::Decrypt(shared_ptr<ABECoreParams<Element>> bm_params,
     else
       dtext->at(i) = typename Element::Integer(0);
   }
+}
+
+template <class Element>
+void CPABEScheme<Element>::Update(shared_ptr<ABECoreParams<Element>> bm_params,
+                                   const ABECoreMasterPublicKey<Element>& bmpk,
+                                   const ABECoreAccessPolicy<Element>& bap,
+                                   ABECoreCiphertext<Element>* bctext,
+                                   Element* bs) {
+  auto m_params = std::static_pointer_cast<CPABEParams<Element>>(bm_params);
+  const auto& mpk = static_cast<const CPABEMasterPublicKey<Element>&>(bmpk);
+  const auto& ap = static_cast<const CPABEAccessPolicy<Element>&>(bap);
+  auto* ctext = static_cast<CPABECiphertext<Element>*>(bctext);
+  usint lenW = 0;
+  usint m_ell = m_params->GetEll();
+  usint m_m = m_params->GetTrapdoorParams()->GetK() + 2;
+  const std::vector<int32_t>& w = ap.GetW();
+  auto ep = m_params->GetTrapdoorParams()->GetElemParams();
+
+  for (usint i = 0; i < m_ell; i++)
+    if (w[i] != 0) lenW++;
+
+  Matrix<Element> err(Element::MakeDiscreteGaussianCoefficientAllocator(
+                          m_params->GetTrapdoorParams()->GetElemParams(),
+                          Format::COEFFICIENT, SIGMA),
+                      m_m, 2 * m_ell + 2 - lenW);
+
+#ifdef OMP
+// #pragma omp parallel for num_threads(4)
+#endif
+  for (usint i = 0; i < m_m; i++) {
+    for (usint j = 0; j < 2 * m_ell + 2 - lenW; j++) err(i, j).SwitchFormat();
+  }
+
+  Element s = *bs;
+  s.SwitchFormat();
+
+  // A part
+  usint iNoise = 0;
+  const Matrix<Element>& pubTA = mpk.GetA();
+  const Matrix<Element>& pubElemBPos = mpk.GetBPos();
+  const Matrix<Element>& pubElemBNeg = mpk.GetBNeg();
+
+  Matrix<Element> ctW(Element::Allocator(ep, Format::EVALUATION), lenW + 1,
+                      m_m);
+  Matrix<Element> cPos(Element::Allocator(ep, Format::EVALUATION), m_ell - lenW,
+                       m_m);
+  Matrix<Element> cNeg(Element::Allocator(ep, Format::EVALUATION), m_ell - lenW,
+                       m_m);
+  // #pragma omp parallel for num_threads(4)
+  for (usint j = 0; j < m_m; j++)
+    (ctW)(0, j) = pubTA(0, j) * s + err(j, iNoise);
+  iNoise++;
+
+  // B part
+  usint iW = 0;
+  usint iAW = 0;
+  // #pragma omp parallel for num_threads(4)
+  for (usint i = 0; i < m_ell; i++) {
+    if (w[i] == 1) {
+      for (usint j = 0; j < m_m; j++)
+        (ctW)(iW + 1, j) = pubElemBPos(i, j) * s + err(j, iNoise);
+      iNoise++;
+      iW++;
+    } else if (w[i] == -1) {
+      for (usint j = 0; j < m_m; j++)
+        (ctW)(iW + 1, j) = pubElemBNeg(i, j) * s + err(j, iNoise);
+      iNoise++;
+      iW++;
+    } else {
+      for (usint j = 0; j < m_m; j++) {
+        (cPos)(iAW, j) = pubElemBPos(i, j) * s + err(j, iNoise);
+        (cNeg)(iAW, j) = pubElemBNeg(i, j) * s + err(j, iNoise + 1);
+      }
+      iNoise += 2;
+      iAW++;
+    }
+  }
+
+  ctext->SetCW(std::make_shared<Matrix<Element>>(ctW));
+  ctext->SetCPos(std::make_shared<Matrix<Element>>(cPos));
+  ctext->SetCNeg(std::make_shared<Matrix<Element>>(cNeg));
 }
 
 }  // namespace lbcrypto

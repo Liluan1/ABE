@@ -38,6 +38,7 @@
 #include "math/backend.h"
 #include "math/distrgen.h"
 #include "utils/inttypes.h"
+#include "cereal/types/memory.hpp"
 
 namespace lbcrypto {
 /*
@@ -145,6 +146,24 @@ class ABECoreMasterPublicKey {
    */
   void SetA(shared_ptr<Matrix<Element>> A) { this->m_A = A; }
 
+  template <class Archive>
+  void save(Archive& ar, std::uint32_t const version) const {
+    ar(::cereal::make_nvp("A", m_A));
+  }
+
+  template <class Archive>
+  void load(Archive& ar, std::uint32_t const version) {
+    if (version > SerializedVersion()) {
+      PALISADE_THROW(deserialize_error,
+                     "serialized object version " + std::to_string(version) +
+                         " is from a later version of the library");
+    }
+    ar(::cereal::make_nvp("A", m_A));
+  }
+
+  std::string SerializedObjectName() const { return "ABECoreMasterPublicKey"; }
+  static uint32_t SerializedVersion() { return 1; }
+
  protected:
   // Public key from trapdoor
   shared_ptr<Matrix<Element>> m_A;
@@ -186,6 +205,24 @@ class ABECoreMasterSecretKey {
    */
   void SetTA(shared_ptr<RLWETrapdoorPair<Element>> TA) { this->m_TA = TA; }
 
+  template <class Archive>
+  void save(Archive& ar, std::uint32_t const version) const {
+    ar(::cereal::make_nvp("TA", m_TA));
+  }
+
+  template <class Archive>
+  void load(Archive& ar, std::uint32_t const version) {
+    if (version > SerializedVersion()) {
+      PALISADE_THROW(deserialize_error,
+                     "serialized object version " + std::to_string(version) +
+                         " is from a later version of the library");
+    }
+    ar(::cereal::make_nvp("TA", m_TA));
+  }
+
+  std::string SerializedObjectName() const { return "ABECoreMasterSecretKey"; }
+  static uint32_t SerializedVersion() { return 1; }
+
  protected:
   // Private key from trapdoor
   shared_ptr<RLWETrapdoorPair<Element>> m_TA;
@@ -224,6 +261,24 @@ class ABECoreSecretKey {
    *@return sk Matrix containing the secret key
    */
   void SetSK(shared_ptr<Matrix<Element>> sk) { this->m_sk = sk; }
+
+  template <class Archive>
+  void save(Archive& ar, std::uint32_t const version) const {
+    ar(::cereal::make_nvp("sk", m_sk));
+  }
+
+  template <class Archive>
+  void load(Archive& ar, std::uint32_t const version) {
+    if (version > SerializedVersion()) {
+      PALISADE_THROW(deserialize_error,
+                     "serialized object version " + std::to_string(version) +
+                         " is from a later version of the library");
+    }
+    ar(::cereal::make_nvp("sk", m_sk));
+  }
+
+  std::string SerializedObjectName() const { return "ABECoreSecretKey"; }
+  static uint32_t SerializedVersion() { return 1; }
 
  protected:
   // Matrix of ring elements acting as secret key
@@ -286,6 +341,24 @@ class ABECoreCiphertext {
    *@param c1 Ciphertext
    */
   void SetC1(const Element& c1) { this->m_c1 = c1; }
+
+  template <class Archive>
+  void save(Archive& ar, std::uint32_t const version) const {
+    ar(::cereal::make_nvp("c1", m_c1));
+  }
+
+  template <class Archive>
+  void load(Archive& ar, std::uint32_t const version) {
+    if (version > SerializedVersion()) {
+      PALISADE_THROW(deserialize_error,
+                     "serialized object version " + std::to_string(version) +
+                         " is from a later version of the library");
+    }
+    ar(::cereal::make_nvp("c1", m_c1));
+  }
+
+  std::string SerializedObjectName() const { return "ABECoreCiphertext"; }
+  static uint32_t SerializedVersion() { return 1; }
 
  protected:
   Element m_c1;
@@ -379,7 +452,7 @@ class ABECoreScheme {
   virtual void Encrypt(shared_ptr<ABECoreParams<Element>> m_params,
                        const ABECoreMasterPublicKey<Element>& mpk,
                        const ABECoreAccessPolicy<Element>& ap, Element ptext,
-                       ABECoreCiphertext<Element>* ctext) {}
+                       ABECoreCiphertext<Element>* ctext, Element* s) {}
   /*
    *@brief Method for encryption phase of an ABE cycle, tailored to the case
    *where target audience is not known beforehand
@@ -417,6 +490,19 @@ class ABECoreScheme {
                        const ABECoreSecretKey<Element>& sk,
                        const ABECoreCiphertext<Element>& ctext,
                        Element* ptext) {}
+
+  /*
+   *@brief Method for updating a ciphertext
+   *@param bm_params Parameters associated with operations
+   *@param bmpk Master public key
+   *@param bap Access policy defining who will be able to decrypt
+   *@param bctext Ciphertext to be updated
+   *@param bs Secret element
+   */
+  virtual void Update(shared_ptr<ABECoreParams<Element>> m_params,
+                      const ABECoreMasterPublicKey<Element>& mpk,
+                      const ABECoreAccessPolicy<Element>& ap,
+                      ABECoreCiphertext<Element>* ctext, Element* s) {}
 
  protected:
   /**

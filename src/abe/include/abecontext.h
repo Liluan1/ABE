@@ -122,7 +122,7 @@ class ABEContext {
    */
   void Encrypt(const ABECoreMasterPublicKey<Element>& mpk,
                const ABECoreAccessPolicy<Element>& ap, const Plaintext& ptext,
-               ABECoreCiphertext<Element>* ct);
+               ABECoreCiphertext<Element>* ct, Element* s = NULL);
   /**
    *@brief Method for decryption with access to identifier/policy
    *@param ap Access structure
@@ -143,6 +143,16 @@ class ABEContext {
    */
   Plaintext Decrypt(const ABECoreSecretKey<Element>& sk,
                     const ABECoreCiphertext<Element>& ct);
+  /**
+   *@brief Method for updating a ciphertext with a new access policy
+   *@param mpk Master public key
+   *@param ap New access policy
+   *@param ct Ciphertext to be updated - Output
+   *@param s Secret element used for encryption
+   */
+  void Update(const ABECoreMasterPublicKey<Element>& mpk,
+              const ABECoreAccessPolicy<Element>& ap,
+              ABECoreCiphertext<Element>* ct, Element* s);
   /**
    *@brief Method for generating a random ring element with context parameters -
    *demo purposes only

@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "abecore.h"
+#include "cereal/types/base_class.hpp"
 
 namespace lbcrypto {
 /*
@@ -118,6 +119,30 @@ class CPABEMasterPublicKey : public ABECoreMasterPublicKey<Element> {
    *@param pubElemD public element
    */
   void SetPubElemD(const Element& pubElemD) { this->m_pubElemD = pubElemD; }
+
+  template <class Archive>
+  void save(Archive& ar, std::uint32_t const version) const {
+    ar(::cereal::base_class<ABECoreMasterPublicKey<Element>>(this));
+    ar(::cereal::make_nvp("Bpos", m_Bpos));
+    ar(::cereal::make_nvp("Bneg", m_Bneg));
+    ar(::cereal::make_nvp("pubElemD", m_pubElemD));
+  }
+
+  template <class Archive>
+  void load(Archive& ar, std::uint32_t const version) {
+    if (version > SerializedVersion()) {
+      PALISADE_THROW(deserialize_error,
+                     "serialized object version " + std::to_string(version) +
+                         " is from a later version of the library");
+    }
+    ar(::cereal::base_class<ABECoreMasterPublicKey<Element>>(this));
+    ar(::cereal::make_nvp("Bpos", m_Bpos));
+    ar(::cereal::make_nvp("Bneg", m_Bneg));
+    ar(::cereal::make_nvp("pubElemD", m_pubElemD));
+  }
+
+  std::string SerializedObjectName() const { return "CPABEMasterPublicKey"; }
+  static uint32_t SerializedVersion() { return 1; }
 
  protected:
   // Uniformly distributed vectors
@@ -325,6 +350,30 @@ class CPABECiphertext : public ABECoreCiphertext<Element> {
    */
   void SetCW(shared_ptr<Matrix<Element>> CW) { this->m_CW = CW; }
 
+  template <class Archive>
+  void save(Archive& ar, std::uint32_t const version) const {
+    ar(::cereal::base_class<ABECoreCiphertext<Element>>(this));
+    ar(::cereal::make_nvp("cPos", m_cPos));
+    ar(::cereal::make_nvp("cNeg", m_cNeg));
+    ar(::cereal::make_nvp("CW", m_CW));
+  }
+
+  template <class Archive>
+  void load(Archive& ar, std::uint32_t const version) {
+    if (version > SerializedVersion()) {
+      PALISADE_THROW(deserialize_error,
+                     "serialized object version " + std::to_string(version) +
+                         " is from a later version of the library");
+    }
+    ar(::cereal::base_class<ABECoreCiphertext<Element>>(this));
+    ar(::cereal::make_nvp("cPos", m_cPos));
+    ar(::cereal::make_nvp("cNeg", m_cNeg));
+    ar(::cereal::make_nvp("CW", m_CW));
+  }
+
+  std::string SerializedObjectName() const { return "CPABECiphertext"; }
+  static uint32_t SerializedVersion() { return 1; }
+
  protected:
   // Vectors used to help decryption process
   shared_ptr<Matrix<Element>> m_cPos, m_cNeg, m_CW;
@@ -408,7 +457,7 @@ class CPABEScheme : public ABECoreScheme<Element> {
   void Encrypt(shared_ptr<ABECoreParams<Element>> m_params,
                const ABECoreMasterPublicKey<Element>& mpk,
                const ABECoreAccessPolicy<Element>& ap, Element ptext,
-               ABECoreCiphertext<Element>* ctext);
+               ABECoreCiphertext<Element>* ctext, Element* s = nullptr);
   /*
    *@brief Method for decryption phase of a CPABE cycle
    *@param m_params Parameters associated with operations
@@ -423,6 +472,19 @@ class CPABEScheme : public ABECoreScheme<Element> {
                const ABECoreAccessPolicy<Element>& ua,
                const ABECoreSecretKey<Element>& usk,
                const ABECoreCiphertext<Element>& ctext, Element* ptext);
+
+  /*
+   *@brief Method for updating a ciphertext
+   *@param bm_params Parameters associated with operations
+   *@param bmpk Master public key
+   *@param bap Access policy defining who will be able to decrypt
+   *@param bctext Ciphertext to be updated
+   *@param bs Secret element
+   */
+  void Update(shared_ptr<ABECoreParams<Element>> m_params,
+              const ABECoreMasterPublicKey<Element>& mpk,
+              const ABECoreAccessPolicy<Element>& ap,
+              ABECoreCiphertext<Element>* ctext, Element* s);
 
  protected:
   /**

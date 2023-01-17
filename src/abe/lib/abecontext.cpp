@@ -100,8 +100,8 @@ template <class Element>
 void ABEContext<Element>::Encrypt(const ABECoreMasterPublicKey<Element>& mpk,
                                   const ABECoreAccessPolicy<Element>& ap,
                                   const Plaintext& ptext,
-                                  ABECoreCiphertext<Element>* ct) {
-  m_scheme->Encrypt(m_params, mpk, ap, ptext->GetElement<Element>(), ct);
+                                  ABECoreCiphertext<Element>* ct, Element* s) {
+  m_scheme->Encrypt(m_params, mpk, ap, ptext->GetElement<Element>(), ct, s);
 }
 // Method for decryption with access to identifier/policy
 template <class Element>
@@ -124,6 +124,13 @@ Plaintext ABEContext<Element>::Decrypt(const ABECoreSecretKey<Element>& sk,
       this->m_params->GetEncodingParams());
   m_scheme->Decrypt(m_params, sk, ct, &(dtext->GetElement<Element>()));
   return dtext;
+}
+// Method for update of ciphertext with new access policy
+template <class Element>
+void ABEContext<Element>::Update(const ABECoreMasterPublicKey<Element>& mpk,
+                                 const ABECoreAccessPolicy<Element>& ap,
+                                 ABECoreCiphertext<Element>* ct, Element* s) {
+  m_scheme->Update(m_params, mpk, ap, ct, s);
 }
 // ethod for generating a random ring element with context parameters - demo
 // purposes only
